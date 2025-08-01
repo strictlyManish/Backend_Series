@@ -45,8 +45,11 @@ async function loginHandler(req, res) {
     res.cookie("token", token);
 
     res.status(200).json({
-        message:"user logged in",
-        username
+        message: "User logged in successfully",
+        find_user: {
+            username: find_user.username,
+            id: find_user._id
+        }
     })
 
 };

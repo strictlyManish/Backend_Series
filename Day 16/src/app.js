@@ -8,7 +8,7 @@ const cookie_parser = require("cookie-parser");
 app.use(cookie_parser());
 app.use(express.json());
 app.use("/caption_ai/auth",auth_routes);
-app.use("/caption_ai/posts",post_routes)
+app.use("/caption_ai/auth/posts",post_routes)
 
 
 
