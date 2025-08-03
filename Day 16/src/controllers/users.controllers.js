@@ -12,9 +12,10 @@ async function registerHandler(req, res) {
         });
     };
 
-    const creat_user = await userModel.create({ username,
-         password:await bcrypt.hash(password,10)
-        });
+    const creat_user = await userModel.create({
+        username,
+        password: await bcrypt.hash(password, 10)
+    });
     const token = jwt.sign({ id: creat_user._id }, process.env.JWT_KEY);
 
     res.cookie("token", token);
@@ -34,7 +35,7 @@ async function loginHandler(req, res) {
         })
     };
 
-    const pass_check = await bcrypt.compare(password,find_user.password)
+    const pass_check = await bcrypt.compare(password, find_user.password)
     if (!pass_check) {
         return res.status(400).json({
             message: "invalid password"
