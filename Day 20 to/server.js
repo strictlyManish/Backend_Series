@@ -22,13 +22,14 @@ io.on("connection", (socket) => {
         try {
             console.log("Received AI message:", data.prompt);
             const response = await genrate_response(data.prompt);
-            console.log("AI Response:", response);
-            socket.emit("ai-message-response", { response });
+            socket.emit("ai-response", { response });
         } catch (error) {
             console.error("AI Service Error:", error.message);
-            socket.emit("ai-message-response", { error: "AI service failed." });
+            socket.emit("ai-response", { error: "AI service failed." });
         }
     });
+
+
 
 });
 
