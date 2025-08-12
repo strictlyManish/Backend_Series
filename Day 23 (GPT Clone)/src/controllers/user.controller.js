@@ -2,8 +2,11 @@ const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+
 async function getRegisterController(req, res) {
-    res.render('register')
+    res.render("register", { error: req.query.error || null });
+
 }
 
 async function postRegisterController(req, res) {
@@ -17,9 +20,8 @@ async function postRegisterController(req, res) {
     })
 
     if (isUserExists) {
-        return res.status(400).json({
-            message: "User already exists with this username or email"
-        });
+        return res.redirect('/auth/register?error=User allready exists');
+
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,34 +35,33 @@ async function postRegisterController(req, res) {
     const token = jwt.sign({ id: user._id }, process.env.JWT_KEY)
 
     res.cookie('token', token);
-
-    return res.status(201).json({
-        message: "User registered successfully",
-        user: user
-    });
+    res.redirect("/auth/login")
 }
 
 async function getLoginController(req, res) {
-    res.render('login');
+    res.render("login", { error: req.query.error || null });
 }
 
 async function postLoginController(req, res) {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
 
 
     const user = await userModel.findOne({
-        email: email
-    })
+        $or: [
+            { email },
+            { username }
+        ]
+    });;
 
     if (!user) {
-        return res.redirect('/login?error=User not found');
-    }
 
+        return res.redirect('/auth/login?error=User not found');
+    };
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-        return res.redirect('/login?error=Invalid password');
+        return res.redirect('/auth/login?error=Invalid password');
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_KEY);
@@ -71,6 +72,7 @@ async function postLoginController(req, res) {
         message: "User logged in successfully",
         user: user
     });
+
 }
 
 
