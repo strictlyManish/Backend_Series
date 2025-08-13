@@ -2,10 +2,14 @@
 // Mobile-first, no framework. Progressive enhancement friendly.
 
 (function () {
+
+    const chat_history = [];
+
     const form = document.querySelector('#composer-form');
     const textarea = document.querySelector('#composer-input');
     const list = document.querySelector('#messages');
-
+    const chat_list = document.querySelector("#chat-list");
+    const chat_title = document.querySelector(".chat-title")
     // Sidebar elements
     const sidebar = document.querySelector('#sidebar');
     const sidebarOpen = document.querySelector('#sidebar-open');
@@ -85,19 +89,24 @@
         textarea.value = '';
         autoresize();
         scrollToBottom();
-
+          chat_title.textContent = text;
         // Show typing indicator
-        const typing = createTyping();
-        list.appendChild(typing);
-        scrollToBottom();
+        // const typing = createTyping();
+        // list.appendChild(typing);
+        // scrollToBottom();
 
         try {
-            // Simulate/perform request
-            const reply = await fakeReply(text);
-
-            // Replace typing with assistant message
-            typing.replaceWith(createMessage({ role: 'assistant', content: reply }));
-            scrollToBottom();
+          
+            str = '';
+            socket.emit('ai-message', text)
+            chat_history.push(text);
+            chat_history.forEach((val)=>{
+                str+= `
+            <button class="chat-list__item is-active">
+              ${val}
+            </button>`
+            });
+            chat_list.innerHTML = str
         } catch (err) {
             typing.remove();
             console.error(err);
@@ -106,6 +115,16 @@
             scrollToBottom();
         }
     });
+    socket.on("ai-message-response", (message) => {
+
+        const messageItem = createMessage({
+            role: "assistant",
+            content: message
+        })
+
+        list.appendChild(messageItem);
+
+    })
 })();
 
 
