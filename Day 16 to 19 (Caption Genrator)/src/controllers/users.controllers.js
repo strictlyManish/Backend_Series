@@ -35,6 +35,7 @@ async function loginHandler(req, res) {
         })
     };
 
+
     const pass_check = await bcrypt.compare(password, find_user.password)
     if (!pass_check) {
         return res.status(400).json({
