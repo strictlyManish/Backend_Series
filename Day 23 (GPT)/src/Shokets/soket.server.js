@@ -40,18 +40,28 @@ function shoketsSetup(httpServer) {
                     role: "user"
                 });
 
+                // Fetch chat history
+                const chatHistory = (await messageModel.find({
+                    chat: messagepayload.chat
+                }).sort({ createdAt: -1 }).limit(20).lean()).reverse()
+
                 // Generate AI response
-                const response = await Genraret_ai(messagepayload.content);
+                const response = await Genraret_ai(chatHistory.map(item => {
+                    return {
+                        role: item.role,
+                        parts: [{ text: item.content }]
+                    }
+                }));
 
                 // Save AI message
                 await messageModel.create({
                     chat: messagepayload.chat,
-                    user: shoket.user._id,       
+                    user: null, // AI is not a user
                     content: response,
                     role: "ai"
                 });
 
-                
+                // Send AI response back to client
                 shoket.emit("ai-response", {
                     content: response,
                     chat: messagepayload.chat
@@ -61,6 +71,7 @@ function shoketsSetup(httpServer) {
                 console.error("Error generating AI response:", error);
             }
         });
+
 
     })
 };
