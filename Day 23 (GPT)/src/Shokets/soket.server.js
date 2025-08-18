@@ -3,6 +3,7 @@ const cookie = require("cookie");
 const jwt = require("jsonwebtoken");
 const userModel = require("../Models/User.model");
 const Genraret_ai = require("../Service/Ai.service");
+const messageModel = require("../Models/Message.model");
 
 function shoketsSetup(httpServer) {
 
@@ -31,19 +32,36 @@ function shoketsSetup(httpServer) {
 
         shoket.on("ai-message", async (messagepayload) => {
             try {
+                // Save user message
+                await messageModel.create({
+                    chat: messagepayload.chat,
+                    user: shoket.user._id,
+                    content: messagepayload.content,
+                    role: "user"
+                });
+
+                // Generate AI response
                 const response = await Genraret_ai(messagepayload.content);
 
+                // Save AI message
+                await messageModel.create({
+                    chat: messagepayload.chat,
+                    user: shoket.user._id,       
+                    content: response,
+                    role: "ai"
+                });
+
+                
                 shoket.emit("ai-response", {
                     content: response,
                     chat: messagepayload.chat
                 });
 
-                console.log("Received:", messagepayload);
-                console.log("AI Response:", response);
             } catch (error) {
                 console.error("Error generating AI response:", error);
             }
         });
+
     })
 };
 module.exports = shoketsSetup;
