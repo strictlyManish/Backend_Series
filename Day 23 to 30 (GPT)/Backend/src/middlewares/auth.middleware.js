@@ -1,32 +1,32 @@
-const userModel = require('../models/user.model');
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const userModel = require("../models/user.model");
 
-
-
-async function authUser(req, res, next) {
-
-    const { token } = req.cookies;
-
-    if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
+async function authMiddleware(req, res, next) {
     try {
+        const { token } = req.cookies;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!token) {
+            return res.status(409).json({
+                message: "Unauthrized"
+            });
+        };
 
-        const user = await userModel.findById(decoded.id)
+        const decode = jwt.verify(token, process.env.JWT_SECRET);
 
+        if (!decode) {
+            return res.status(409).json({
+                message: "Unauthrized"
+            });
+        }
+        const user = await userModel.findOne({ id: decode._id });
         req.user = user;
-
-        next()
-
-    } catch (err) {
-        res.status(401).json({ message: 'Unauthorized' });
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            message: "something went wrong."
+        })
     }
+};
 
-}
 
-module.exports = {
-    authUser
-}
+module.exports = authMiddleware;

@@ -1,20 +1,15 @@
-const express = require('express');
-const authMiddleware = require("../middlewares/auth.middleware")
-const chatController = require("../controllers/chat.controller")
+const express = require("express");
+const chat = express.Router();
+const { chatController, getChats, getMessages } = require("../controllers/chat.controller"); // ✅ destructure
+const authMiddleware = require("../middlewares/auth.middleware");
 
+// Create chat
+chat.post("/chat", authMiddleware, chatController);
 
-const router = express.Router();
+// Get all chats
+chat.get("/", authMiddleware, getChats);
 
-/* POST /api/chat/ */
-router.post('/', authMiddleware.authUser, chatController.createChat)
+// Get messages of a chat
+chat.get("/messages/:id", authMiddleware, getMessages);
 
-
-/* GET /api/chat/ */
-router.get('/', authMiddleware.authUser, chatController.getChats)
-
-
-/* GET /api/chat/messages/:id */
-router.get('/messages/:id', authMiddleware.authUser, chatController.getMessages)
-
-
-module.exports = router;
+module.exports = chat;

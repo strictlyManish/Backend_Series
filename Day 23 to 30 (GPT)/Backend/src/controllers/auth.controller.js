@@ -3,9 +3,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
-async function registerUser(req, res) {
+async function registerController(req, res) {
 
-    const { fullName: { firstName, lastName }, email, password } = req.body;
+    const { username, password, email } = req.body;
 
     const isUserAlreadyExists = await userModel.findOne({ email })
 
@@ -18,18 +18,14 @@ async function registerUser(req, res) {
 
 
     const user = await userModel.create({
-        fullName: {
-            firstName, lastName
-        },
+        username,
         email,
         password: hashPassword
     })
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
-
     res.cookie("token", token)
-
 
     res.status(201).json({
         message: "User registered successfully",
@@ -41,35 +37,26 @@ async function registerUser(req, res) {
     })
 }
 
-async function loginUser(req, res) {
-
-    const { email, password } = req.body;
+async function loginController(req, res) {
+    const { username, password } = req.body;
 
     const user = await userModel.findOne({
-        email
-    })
-
+        username
+    });
+    
     if (!user) {
-        return res.status(400).json({ message: "Invalid email or password" });
+        return res.status(400).json({ message: "Invalid username or password" });
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
-
     if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid email or password" });
+        return res.status(400).json({ message: "Invalid username or password" });
     }
-
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
-
     res.cookie("token", token);
-
-
     res.status(200).json({
         message: "user logged in successfully",
         user: {
-            email: user.email,
+            username: user.username,
             _id: user._id,
             fullName: user.fullName
         }
@@ -79,6 +66,6 @@ async function loginUser(req, res) {
 
 
 module.exports = {
-    registerUser,
-    loginUser
+    registerController,
+    loginController
 }

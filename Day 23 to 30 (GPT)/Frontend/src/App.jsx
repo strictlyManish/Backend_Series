@@ -1,15 +1,10 @@
-import { useState } from 'react'
 
-import './App.css'
-import AppRoutes from './AppRoutes'
-
+import AppRoutes from './routes/AppRoutes';
 function App() {
-
-
   return (
-    <>
-      <AppRoutes />
-    </>
+    <div className='bg-gray-900 h-screen w-screen text-white'>
+      <AppRoutes/>
+    </div>
   )
 }
 
