@@ -33,9 +33,6 @@ Each topic is broken down into clear lessons with explanations, sample code, and
 - ✅ **Advanced Routing & Project Structuring**  
   Move from simple projects to enterprise-grade architecture with modular routes, services, and MVC-like patterns.  
 
-- ✅ **Hosting & Deployment Basics**  
-  Deploy projects to platforms like Render, Vercel, or Heroku, and learn about environment variables, scaling, and CI/CD basics.  
-
 ---
 
 ## 🛠 Tools & Tech Stack  
